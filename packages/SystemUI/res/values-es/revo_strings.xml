@@ -80,9 +80,16 @@
 
     <string name="recents_free_ram">Memoria libre: %1$d MB</string>
 
+    <!-- Heads Up QS Tile -->
+    <string name="quick_settings_heads_up_label">Heads up</string>
+    <string name="accessibility_quick_settings_heads_up_off">Heads up apagadas.</string>
+    <string name="accessibility_quick_settings_heads_up_on">Heads up encendidas.</string>
+    <string name="accessibility_quick_settings_heads_up_changed_off">Se han desactivado las notificaciones emergentes.</string>
+    <string name="accessibility_quick_settings_heads_up_changed_on">Se han activado las notificaciones emergentes.</string>
+
     <!-- Heads up snooze toast -->
-    <string name="heads_up_snooze_message_one_minute"><xliff:g id="string">%s</xliff:g> - La notificación será silenciada durante 1 minuto.</string>
-    <string name="heads_up_snooze_message"><xliff:g id="string">%s</xliff:g> - La notificación será silenciada durante <xliff:g id="number">%d</xliff:g> minutos.</string>
+    <string name="heads_up_snooze_message_one_minute"><xliff:g id="string">%s</xliff:g> - La notificación emergente será silenciada durante 1 minuto.</string>
+    <string name="heads_up_snooze_message"><xliff:g id="string">%s</xliff:g> - La notificación emergente será silenciada durante <xliff:g id="number">%d</xliff:g> minutos.</string>
 
 </resources>
 
