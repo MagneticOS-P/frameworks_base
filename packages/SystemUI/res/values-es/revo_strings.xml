@@ -51,5 +51,11 @@
     <string name="global_action_screenshot">Captura de pantalla</string>
     <string name="global_action_restart_hot">Rápido</string>
 
+    <!-- Sound QS Tile -->
+    <string name="quick_settings_sound_label">Sonido</string>
+    <string name="quick_settings_sound_ring">Tono</string>
+    <string name="quick_settings_sound_vibrate">Vibrar</string>
+    <string name="quick_settings_sound_dnd">No molestar</string>
+
 </resources>
 
