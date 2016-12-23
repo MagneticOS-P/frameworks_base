@@ -78,5 +78,7 @@
     <string name="screenshot_abort_title">No se ha echo la captura de pantalla</string>
     <string name="screenshot_abort_text">Operación cancelada</string>
 
+    <string name="recents_free_ram">Memoria libre: %1$d MB</string>
+
 </resources>
 
