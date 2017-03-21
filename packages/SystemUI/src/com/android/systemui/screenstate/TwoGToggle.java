@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.systemui.revo.screenstate;
+package com.android.systemui.screenstate;
 
 import android.content.Context;
 import android.provider.Settings;
@@ -21,7 +21,6 @@ import android.telephony.TelephonyManager;
 import com.android.internal.telephony.Phone;
 import android.util.Log;
 import android.net.ConnectivityManager;
-import android.os.UserHandle;
 
 public class TwoGToggle extends ScreenStateToggle {
     private static final String TAG = "ScreenStateService_TwoGToggle";
@@ -41,8 +40,7 @@ public class TwoGToggle extends ScreenStateToggle {
             Log.d(TAG, "Data not enabled");
             return false;
         }
-        int s = Settings.System.getIntForUser(mContext.getContentResolver(),
-                    Settings.System.SCREEN_STATE_TWOG, 0, UserHandle.USER_CURRENT);
+        int s = Settings.System.getInt(mContext.getContentResolver(), Settings.System.SCREEN_STATE_TWOG, 0);
         if(s!=0)
             return true;
         else

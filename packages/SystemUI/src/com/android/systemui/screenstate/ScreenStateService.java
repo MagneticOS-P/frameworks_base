@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.systemui.revo.screenstate;
+package com.android.systemui.screenstate;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -27,7 +27,6 @@ import android.util.Log;
 import android.database.ContentObserver;
 import android.content.ContentResolver;
 import android.os.Handler;
-import android.os.UserHandle;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -93,8 +92,7 @@ public class ScreenStateService extends Service  {
         mContext = getApplicationContext();
 
         // firewall
-        int s = Settings.System.getIntForUser(mContext.getContentResolver(),
-                    Settings.System.START_SCREEN_STATE_SERVICE, 0, UserHandle.USER_CURRENT);
+        int s = Settings.System.getInt(mContext.getContentResolver(), Settings.System.START_SCREEN_STATE_SERVICE, 0);
         if(s!=0)
             mEnabled = true;
         else
@@ -135,8 +133,7 @@ public class ScreenStateService extends Service  {
                     if(onScheduled){
                         scrOnHandler.removeCallbacks(scrOnTask);
                     } else {
-                        int sec = Settings.System.getIntForUser(mContext.getContentResolver(),
-                                    Settings.System.SCREEN_STATE_OFF_DELAY, 0, UserHandle.USER_CURRENT);
+                        int sec = Settings.System.getInt(mContext.getContentResolver(), Settings.System.SCREEN_STATE_OFF_DELAY, 0);
                         Log.d(TAG, "screen off delay: " + sec);
                         scrOffHandler.postDelayed(scrOffTask, sec * 1000);
                         offScheduled = true;
@@ -147,8 +144,7 @@ public class ScreenStateService extends Service  {
                     if(offScheduled){
                         scrOffHandler.removeCallbacks(scrOffTask);
                     } else {
-                        int sec = Settings.System.getIntForUser(mContext.getContentResolver(),
-                                    Settings.System.SCREEN_STATE_ON_DELAY, 0, UserHandle.USER_CURRENT);
+                        int sec = Settings.System.getInt(mContext.getContentResolver(), Settings.System.SCREEN_STATE_ON_DELAY, 0);
                         Log.d(TAG, "screen on delay: " + sec);
                         scrOnHandler.postDelayed(scrOnTask, sec * 1000);
                         onScheduled = true;

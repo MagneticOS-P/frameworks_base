@@ -295,7 +295,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".revo.screenstate.ScreenStateService"
+        <service android:name=".screenstate.ScreenStateService"
                 android:exported="true" >
             <intent-filter>
                <action android:name="android.intent.action.SCREEN_STATE_SERVICE_UPDATE"/>
@@ -658,6 +658,12 @@
             <intent-filter>
                 <action android:name="com.android.intent.action.DISMISS_KEYBOARD_SHORTCUTS" />
                 <action android:name="com.android.intent.action.SHOW_KEYBOARD_SHORTCUTS" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".BootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 

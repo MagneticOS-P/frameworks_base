@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.systemui.revo.screenstate;
+package com.android.systemui.screenstate;
 
 import android.content.Context;
 import android.location.LocationManager;
-import android.os.UserHandle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -30,8 +29,7 @@ public class GpsToggle extends ScreenStateToggle {
     }
 
     protected boolean isEnabled(){
-        int s = Settings.System.getIntForUser(mContext.getContentResolver(),
-                    Settings.System.SCREEN_STATE_GPS, 0, UserHandle.USER_CURRENT);
+        int s = Settings.System.getInt(mContext.getContentResolver(), Settings.System.SCREEN_STATE_GPS, 0);
         if(s != 0)
             return true;
         else

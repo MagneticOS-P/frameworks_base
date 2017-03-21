@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.systemui.revo.screenstate;
+package com.android.systemui.screenstate;
 
 import android.content.Context;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.os.Looper;
-import android.os.UserHandle;
 
 public abstract class ScreenStateToggle {
     protected Context mContext;

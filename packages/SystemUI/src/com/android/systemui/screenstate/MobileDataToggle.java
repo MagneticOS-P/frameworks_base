@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.systemui.revo.screenstate;
+package com.android.systemui.screenstate;
 
 import android.content.Context;
-import android.os.UserHandle;
 import android.provider.Settings;
 import android.net.ConnectivityManager;
 import android.telephony.TelephonyManager;
@@ -34,8 +33,7 @@ public class MobileDataToggle extends ScreenStateToggle {
         if (!cm.isNetworkSupported(ConnectivityManager.TYPE_MOBILE)){
             return false;
         }
-        int s = Settings.System.getIntForUser(mContext.getContentResolver(),
-                    Settings.System.SCREEN_STATE_MOBILE_DATA, 0, UserHandle.USER_CURRENT);
+        int s = Settings.System.getInt(mContext.getContentResolver(), Settings.System.SCREEN_STATE_MOBILE_DATA, 0);
         if(s!=0)
             return true;
         else

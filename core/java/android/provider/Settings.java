@@ -4923,6 +4923,37 @@ public final class Settings {
         public static final String HEADS_UP_NOTIFICATION_SNOOZE = "heads_up_notification_snooze";
 
         /**
+        * @hide
+         */
+        public static final String START_SCREEN_STATE_SERVICE = "start_screen_state_service";
+
+
+        /**
+         * @hide
+         */
+        public static final String SCREEN_STATE_TWOG = "screen_state_twog";
+
+        /**
+         * @hide
+         */
+        public static final String SCREEN_STATE_GPS = "screen_state_gps";
+
+        /**
+         * @hide
+         */
+        public static final String SCREEN_STATE_MOBILE_DATA = "screen_state_mobile_data";
+
+        /**
+         * @hide
+         */
+        public static final String SCREEN_STATE_OFF_DELAY = "screen_state_off_delay";
+
+        /**
+         * @hide
+         */
+        public static final String SCREEN_STATE_ON_DELAY = "screen_state_on_delay";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
@@ -5164,6 +5195,12 @@ public final class Settings {
             PRIVATE_SETTINGS.add(RECENTS_COMPONENT);
             PRIVATE_SETTINGS.add(DISPLAY_CUTOUT_MODE);
             PRIVATE_SETTINGS.add(STOCK_STATUSBAR_IN_HIDE);
+            PRIVATE_SETTINGS.add(START_SCREEN_STATE_SERVICE);
+            PRIVATE_SETTINGS.add(SCREEN_STATE_TWOG);
+            PRIVATE_SETTINGS.add(SCREEN_STATE_GPS);
+            PRIVATE_SETTINGS.add(SCREEN_STATE_MOBILE_DATA);
+            PRIVATE_SETTINGS.add(SCREEN_STATE_OFF_DELAY);
+            PRIVATE_SETTINGS.add(SCREEN_STATE_ON_DELAY);
         }
 
         /**
