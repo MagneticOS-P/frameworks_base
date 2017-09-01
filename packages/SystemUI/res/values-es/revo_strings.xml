@@ -74,5 +74,9 @@
 
     <string name="quick_settings_reboot_label">Reiniciar</string>
 
+    <!-- Partial screenshot -->
+    <string name="screenshot_abort_title">No se ha echo la captura de pantalla</string>
+    <string name="screenshot_abort_text">Operación cancelada</string>
+
 </resources>
 
