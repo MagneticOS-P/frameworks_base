@@ -51,4 +51,9 @@
     <string name="global_action_screenshot">Screenshot</string>
     <string name="global_action_restart_hot">Hot</string>
 
+    <!-- LTE QS Tile -->
+    <string name="qs_lte_label">4G</string>
+    <string name="lte_on">4G ON </string>
+    <string name="lte_off">4G OFF</string>
+
 </resources>
