@@ -61,6 +61,7 @@
 
     <!-- Screenshot -->
     <string name="quick_settings_screenshot_label">Captura</string>
+    <string name="quick_settings_region_screenshot_label">Parcial</string>
 
 </resources>
 
