@@ -31,6 +31,7 @@ import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.os.SystemProperties;
+import android.net.ConnectivityManager;
 
 import com.android.internal.statusbar.IStatusBarService;
 
@@ -38,6 +39,9 @@ import com.android.internal.statusbar.IStatusBarService;
  * Some custom utilities
  */
 public class RevoUtils {
+
+    public static final String INTENT_SCREENSHOT = "action_take_screenshot";
+    public static final String INTENT_REGION_SCREENSHOT = "action_take_region_screenshot";
 
     public static void switchScreenOff(Context ctx) {
         PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
@@ -81,6 +85,15 @@ public class RevoUtils {
                 }
                 return mStatusBarService;
             }
+        }
+    }
+
+    public static void takeScreenshot(boolean full) {
+        IWindowManager wm = WindowManagerGlobal.getWindowManagerService();
+        try {
+            wm.sendCustomAction(new Intent(full? INTENT_SCREENSHOT : INTENT_REGION_SCREENSHOT));
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 }
