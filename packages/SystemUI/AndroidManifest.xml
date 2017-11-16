@@ -230,6 +230,10 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="org.pixelexperience.ambient.play.history.MANAGE_HISTORY" />
 
+    <!-- Reboot -->
+    <uses-permission android:name="android.permission.REBOOT" />
+    <uses-permission android:name="android.permission.RECOVERY" />
+
     <application
         android:name=".SystemUIApplication"
         android:persistent="true"

@@ -72,5 +72,7 @@
     <string name="quick_settings_location_secondary_high_accuracy">Alta precisión</string>
     <string name="accessibility_quick_settings_location_high_accuracy">Ubicación: modo alta precisión.</string>
 
+    <string name="quick_settings_reboot_label">Reiniciar</string>
+
 </resources>
 
