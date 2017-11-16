@@ -59,5 +59,8 @@
 
     <string name="statusbar_items_title">Elementos de la barra de estado</string>
 
+    <!-- Screenshot -->
+    <string name="quick_settings_screenshot_label">Captura</string>
+
 </resources>
 
