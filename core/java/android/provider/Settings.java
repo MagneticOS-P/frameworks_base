@@ -5003,6 +5003,11 @@ public final class Settings {
         private static final Validator STATUS_BAR_FILE_HEADER_IMAGE_VALIDATOR =
                 ANY_STRING_VALIDATOR;
 
+         /**
+         * Whether to display the power menu dialog while on the lockscreen
+         * @hide
+         */
+        public static final String POWERMENU_LOCKSCREEN = "powermenu_lockscreen";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
