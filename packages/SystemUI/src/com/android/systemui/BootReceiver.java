@@ -48,9 +48,10 @@ public class BootReceiver extends BroadcastReceiver {
             mContext = context;
 
             // start the screen state service if activated
-            if (Settings.System.getInt(mContext.getContentResolver(), Settings.System.START_SCREEN_STATE_SERVICE, 0) != 0) {
-                Intent screenstate = new Intent(context, com.android.systemui.screenstate.ScreenStateService.class);
-                context.startService(screenstate);
+            if (Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                    Settings.Secure.START_SCREEN_STATE_SERVICE, 0, UserHandle.USER_CURRENT) != 0) {
+                Intent screenstate = new Intent(mContext, com.android.systemui.screenstate.ScreenStateService.class);
+                mContext.startService(screenstate);
             }
 
         } catch (Exception e) {
