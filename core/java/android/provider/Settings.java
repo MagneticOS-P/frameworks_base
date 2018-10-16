@@ -4704,11 +4704,18 @@ public final class Settings {
         public static final String VOLUME_ROCKER_WAKE = "volume_rocker_wake";
 
         /**
+         * 0 - Default
+         * 1 - Round with ring
+         * 2 - Two-toned round with ring
+	     * 3 - Squircle with ring
+         * @hide
+         */
+        public static final String QS_TILE_STYLE = "qs_tile_style";
 
         /**
-	 ** Whether to use partial screenshot when using volume keys
-	 ** @hide
-	 **/
+	    ** Whether to use partial screenshot when using volume keys
+	    ** @hide
+	    **/
         public static final String SCREENSHOT_TYPE = "screenshot_type";
 
         /**
@@ -4938,6 +4945,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(PROXIMITY_AUTO_SPEAKER);
             PRIVATE_SETTINGS.add(PROXIMITY_AUTO_SPEAKER_DELAY);
             PRIVATE_SETTINGS.add(PROXIMITY_AUTO_SPEAKER_INCALL_ONLY);
+            PRIVATE_SETTINGS.add(QS_TILE_STYLE);       
         }
 
         /**
