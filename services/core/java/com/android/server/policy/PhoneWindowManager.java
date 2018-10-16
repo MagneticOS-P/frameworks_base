@@ -1311,9 +1311,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mEdgeListenerActivated = false;
         }
         if (flags != mLastEdgePositions) {
-            mEdgeGestureManager.updateEdgeGestureActivationListener(mEdgeGestureActivationListener,
+            if (mEdgeGestureManager != null ){
+                mEdgeGestureManager.updateEdgeGestureActivationListener(mEdgeGestureActivationListener,
                     flags);
-            mLastEdgePositions = flags;
+                mLastEdgePositions = flags;
+            }
         }
     }
 
@@ -8339,9 +8341,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         if (mVrManagerInternal != null) {
             mVrManagerInternal.addPersistentVrModeStateListener(mPersistentVrModeListener);
         }
+
         mEdgeGestureManager = EdgeGestureManager.getInstance();
-        mEdgeGestureManager.setEdgeGestureActivationListener(mEdgeGestureActivationListener);
-        mSettingsObserver.observe();
+
+        if (mEdgeGestureManager != null) {
+            mEdgeGestureManager.setEdgeGestureActivationListener(mEdgeGestureActivationListener);
+        }
 
         readCameraLensCoverState();
         updateUiMode();
