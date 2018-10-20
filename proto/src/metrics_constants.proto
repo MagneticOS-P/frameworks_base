@@ -6126,5 +6126,8 @@ message MetricsEvent {
     // CustomSettings constant
     CUSTOM_SETTINGS = 1500;
 
+    // RevoSettings constant
+    REVO_SETTINGS = 1501;
+
   }
 }
