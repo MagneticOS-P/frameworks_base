@@ -62,4 +62,6 @@
     <string name="quick_settings_sound_vibrate">Vibrate</string>
     <string name="quick_settings_sound_dnd">Do not disturb</string>
 
+    <string name="statusbar_items_title">Status bar items</string>
+
 </resources>

@@ -57,5 +57,7 @@
     <string name="quick_settings_sound_vibrate">Vibrar</string>
     <string name="quick_settings_sound_dnd">No molestar</string>
 
+    <string name="statusbar_items_title">Elementos de la barra de estado</string>
+
 </resources>
 
