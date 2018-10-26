@@ -2217,6 +2217,9 @@ public class ActivityManagerService extends IActivityManager.Stub
                     }
                 }
                 callbacks.finishBroadcast();
+                // We have to clean up the RemoteCallbackList here, because otherwise it will
+                // needlessly hold the enclosed callbacks until the remote process dies.
+                callbacks.kill();
             } break;
             case UPDATE_TIME_ZONE: {
                 synchronized (ActivityManagerService.this) {
@@ -24408,6 +24411,18 @@ public class ActivityManagerService extends IActivityManager.Stub
         boolean success = true;
 
         if (app.curRawAdj != app.setRawAdj) {
+            String seempStr = "app_uid=" + app.uid
+                + ",app_pid=" + app.pid + ",oom_adj=" + app.curAdj
+                + ",setAdj=" + app.setAdj + ",hasShownUi=" + (app.hasShownUi ? 1 : 0)
+                + ",cached=" + (app.cached ? 1 : 0)
+                + ",fA=" + (app.foregroundActivities ? 1 : 0)
+                + ",fS=" + (app.foregroundServices ? 1 : 0)
+                + ",systemNoUi=" + (app.systemNoUi ? 1 : 0)
+                + ",curSchedGroup=" + app.curSchedGroup
+                + ",curProcState=" + app.curProcState + ",setProcState=" + app.setProcState
+                + ",killed=" + (app.killed ? 1 : 0) + ",killedByAm=" + (app.killedByAm ? 1 : 0)
+                + ",debugging=" + (app.debugging ? 1 : 0);
+            android.util.SeempLog.record_str(385, seempStr);
             app.setRawAdj = app.curRawAdj;
         }
 
@@ -26895,6 +26910,25 @@ public class ActivityManagerService extends IActivityManager.Stub
         @Override
         public void enforceCallerIsRecentsOrHasPermission(String permission, String func) {
             ActivityManagerService.this.enforceCallerIsRecentsOrHasPermission(permission, func);
+        }
+
+        @Override
+        public Intent getHomeIntent() {
+            synchronized (ActivityManagerService.this) {
+                return ActivityManagerService.this.getHomeIntent();
+            }
+        }
+
+        @Override
+        public void notifyDefaultDisplaySizeChanged() {
+            synchronized (this) {
+                if (mSystemServiceManager.isBootCompleted() && mHomeProcess != null) {
+
+                    // TODO: Ugly hack to unblock the release
+                    Slog.i(TAG, "Killing home process because of display size change");
+                    removeProcessLocked(mHomeProcess, false, true, "kill home screen size");
+                }
+            }
         }
     }
 
