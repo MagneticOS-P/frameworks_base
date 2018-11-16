@@ -1977,7 +1977,7 @@ public class ExpandableNotificationRow extends ActivatableNotificationView
 
     public boolean isUserExpanded() {
         if (Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.FORCE_EXPANDED_NOTIFICATIONS, 0) != 1) {
+                Settings.System.FORCE_EXPANDED_NOTIFICATIONS, 0) == 1) {
             return mUserExpanded;
         } else {
             return true;
