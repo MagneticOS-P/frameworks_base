@@ -15,6 +15,7 @@
  */
 package com.android.systemui.statusbar.policy;
 
+import android.content.ContentResolver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +25,8 @@ import android.database.ContentObserver;
 import android.net.NetworkCapabilities;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.UserHandle;
+import android.provider.Settings;
 import android.provider.Settings.Global;
 import android.telephony.ims.ImsReasonInfo;
 import android.telephony.ims.stub.ImsRegistrationImplBase;
