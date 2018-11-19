@@ -1902,9 +1902,10 @@ public class StatusBar extends SystemUI implements DemoMode,
                     Log.v(TAG, "DEBUG_MEDIA: Fading out album artwork");
                 }
                 boolean cannotAnimateDoze = mDozing && !ScrimState.AOD.getAnimateChange();
-                if (mFingerprintUnlockController.getMode()
-                        == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK_PULSING
-                        || hideBecauseOccluded || cannotAnimateDoze) {
+                int fpMode = mFingerprintUnlockController.getMode();
+                if (fpMode == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK_PULSING ||
+                        fpMode == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK ||
+                        hideBecauseOccluded || cannotAnimateDoze) {
 
                     // We are unlocking directly - no animation!
                     mBackdrop.setVisibility(View.GONE);
@@ -5572,7 +5573,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         if (!mNotificationPanel.isFullyCollapsed()) {
             // close the shade if it was open
             animateCollapsePanels(CommandQueue.FLAG_EXCLUDE_RECENTS_PANEL, true /* force */,
-                    true /* delayed */);
+                    true /* delayed */, NotificationPanelView.SPEED_UP_FACTOR_CLICKED);
             visibilityChanged(false);
 
             return true;
