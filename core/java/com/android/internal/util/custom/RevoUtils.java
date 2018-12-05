@@ -16,6 +16,9 @@
 
 package com.android.internal.util.custom;
 
+import android.content.Intent;
+import android.view.IWindowManager;
+import android.view.WindowManagerGlobal;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.input.InputManager;
