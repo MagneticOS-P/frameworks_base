@@ -16,6 +16,7 @@
 
 package com.android.internal.util.custom;
 
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.view.IWindowManager;
 import android.view.WindowManagerGlobal;
@@ -34,6 +35,8 @@ import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.os.SystemProperties;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 
 import java.util.List;
