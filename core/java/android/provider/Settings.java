@@ -8439,6 +8439,12 @@ public final class Settings {
         public static final String EDGE_GESTURES_BACK_SCREEN_PERCENT = "edge_gestures_back_screen_percent";
 
         /**
+         * Show UI feedback when using back gesture.
+         * @hide
+         */
+        public static final String EDGE_GESTURES_BACK_SHOW_UI_FEEDBACK = "edge_gestures_back_show_ui_feedback";
+
+        /**
          * Whether or not the automatic storage manager is enabled and should run on the device.
          *
          * @hide
@@ -8711,13 +8717,6 @@ public final class Settings {
          */
         public static final String FACE_AUTO_UNLOCK = "face_auto_unlock";
 
-
-        /**
-         * Show UI feedback when using back gesture.
-         * @hide
-         */
-        public static final String EDGE_GESTURES_BACK_SHOW_UI_FEEDBACK = "edge_gestures_back_show_ui_feedback";
-
         /**
          * This are the settings to be backed up.
          *
@@ -8727,6 +8726,7 @@ public final class Settings {
          *
          * @hide
          */
+
         public static final String[] SETTINGS_TO_BACKUP = {
             BUGREPORT_IN_POWER_MENU,                            // moved to global
             ALLOW_MOCK_LOCATION,
