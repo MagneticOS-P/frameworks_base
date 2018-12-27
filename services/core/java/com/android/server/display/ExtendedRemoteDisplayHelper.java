@@ -26,15 +26,17 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.android.server.display;
+
+import android.content.Context;
+import android.media.RemoteDisplay;
+import android.os.Handler;
+import android.util.Slog;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import android.media.RemoteDisplay;
-import android.os.Handler;
-import android.util.Slog;
-import android.content.Context;
 
 class ExtendedRemoteDisplayHelper {
     private static final String TAG = "ExtendedRemoteDisplayHelper";
@@ -60,28 +62,30 @@ class ExtendedRemoteDisplayHelper {
         try {
             sExtRemoteDisplayClass = Class.forName("com.qualcomm.wfd.ExtendedRemoteDisplay");
         } catch (Throwable t) {
-            Slog.i(TAG, "ExtendedRemoteDisplay Not available.");
+            Slog.i(TAG, "ExtendedRemoteDisplay: not available");
         }
 
         if(sExtRemoteDisplayClass != null) {
             // If ExtendedRemoteDisplay is available find the methods
-            Slog.i(TAG, "ExtendedRemoteDisplay Is available. Find Methods");
+            Slog.i(TAG, "ExtendedRemoteDisplay: is available, finding methods");
             try {
                 Class args[] = {
                                    String.class,
                                    RemoteDisplay.Listener.class,
                                    Handler.class, Context.class
                                };
-                sExtRemoteDisplayListen = sExtRemoteDisplayClass.getDeclaredMethod("listen", args);
+                sExtRemoteDisplayListen = sExtRemoteDisplayClass.getDeclaredMethod("listen",
+                    args);
             } catch (Throwable t) {
-                Slog.i(TAG, "ExtendedRemoteDisplay.listen Not available.");
+                Slog.i(TAG, "ExtendedRemoteDisplay.listen: not available");
             }
 
             try {
                 Class args[] = {};
-                sExtRemoteDisplayDispose = sExtRemoteDisplayClass.getDeclaredMethod("dispose", args);
+                sExtRemoteDisplayDispose = sExtRemoteDisplayClass.getDeclaredMethod("dispose",
+                    args);
             } catch (Throwable t) {
-                Slog.i(TAG, "ExtendedRemoteDisplay.dispose Not available.");
+                Slog.i(TAG, "ExtendedRemoteDisplay.dispose: not available");
             }
         }
     }
@@ -96,17 +100,16 @@ class ExtendedRemoteDisplayHelper {
      * @param context The current service context
      *  */
     public static Object listen(String iface, RemoteDisplay.Listener listener,
-                                         Handler handler, Context context)
-    {
+            Handler handler, Context context) {
         Object extRemoteDisplay = null;
         Slog.i(TAG, "ExtendedRemoteDisplay.listen");
 
-        if(sExtRemoteDisplayListen != null && sExtRemoteDisplayDispose != null){
+        if (sExtRemoteDisplayListen != null && sExtRemoteDisplayDispose != null) {
             try {
                 extRemoteDisplay = sExtRemoteDisplayListen.invoke(null,
-                                  iface, listener, handler, context);
+                        iface, listener, handler, context);
             } catch (InvocationTargetException e) {
-                Slog.i(TAG, "ExtendedRemoteDisplay.listen - InvocationTargetException");
+                Slog.i(TAG, "ExtendedRemoteDisplay.listen: InvocationTargetException");
                 Throwable cause = e.getCause();
                 if (cause instanceof RuntimeException) {
                     throw (RuntimeException) cause;
@@ -116,7 +119,7 @@ class ExtendedRemoteDisplayHelper {
                     throw new RuntimeException(e);
                 }
             } catch (IllegalAccessException e) {
-                Slog.i(TAG, "ExtendedRemoteDisplay.listen -IllegalAccessException");
+                Slog.i(TAG, "ExtendedRemoteDisplay.listen: IllegalAccessException");
                 e.printStackTrace();
             }
         }
@@ -128,10 +131,10 @@ class ExtendedRemoteDisplayHelper {
      */
     public static void dispose(Object extRemoteDisplay) {
         Slog.i(TAG, "ExtendedRemoteDisplay.dispose");
-        try{
+        try {
             sExtRemoteDisplayDispose.invoke(extRemoteDisplay);
         } catch (InvocationTargetException e) {
-            Slog.i(TAG, "ExtendedRemoteDisplay.dispose - InvocationTargetException");
+            Slog.i(TAG, "ExtendedRemoteDisplay.dispose: InvocationTargetException");
             Throwable cause = e.getCause();
             if (cause instanceof RuntimeException) {
                 throw (RuntimeException) cause;
@@ -141,7 +144,7 @@ class ExtendedRemoteDisplayHelper {
                 throw new RuntimeException(e);
             }
         } catch (IllegalAccessException e) {
-            Slog.i(TAG, "ExtendedRemoteDisplay.dispose-IllegalAccessException");
+            Slog.i(TAG, "ExtendedRemoteDisplay.dispose: IllegalAccessException");
             e.printStackTrace();
         }
     }
@@ -149,15 +152,13 @@ class ExtendedRemoteDisplayHelper {
     /**
      * Checks if ExtendedRemoteDisplay is available
      */
-    public static boolean isAvailable()
-    {
-        if(sExtRemoteDisplayClass != null &&
-           sExtRemoteDisplayDispose != null &&
-           sExtRemoteDisplayListen != null) {
-            Slog.i(TAG, "ExtendedRemoteDisplay isAvailable() : Available.");
+    public static boolean isAvailable() {
+        if (sExtRemoteDisplayClass != null && sExtRemoteDisplayDispose != null &&
+                sExtRemoteDisplayListen != null) {
+            Slog.i(TAG, "ExtendedRemoteDisplay.isAvailable(): available");
             return true;
         }
-        Slog.i(TAG, "ExtendedRemoteDisplay isAvailable() : Not Available.");
+        Slog.i(TAG, "ExtendedRemoteDisplay.isAvailable(): not available");
         return false;
     }
 }
