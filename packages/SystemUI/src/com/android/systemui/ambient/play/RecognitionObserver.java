@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2014 Fastboot Mobile, LLC.
  * Copyright (C) 2018 CypherOS
  * Copyright (C) 2018 PixelExperience
  *
@@ -24,9 +25,10 @@ import android.os.Process;
 import android.provider.Settings;
 import android.util.Log;
 
-import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
+
+import com.android.internal.util.custom.ambient.play.AmbientPlayProvider;
+import com.android.internal.util.custom.ambient.play.AmbientPlayProvider.Observable;
 
 /**
  * Class helping audio fingerprinting for recognition
@@ -48,10 +50,11 @@ public class RecognitionObserver implements AmbientIndicationManagerCallback {
     private RecorderThread mRecThread;
     private boolean isRecording = false;
     private AmbientIndicationManager mManager;
-    private boolean isRecognitionEnabled;
+    private Context mContext;
 
     RecognitionObserver(Context context, AmbientIndicationManager manager) {
         this.mManager = manager;
+        this.mContext = context;
         manager.registerCallback(this);
     }
 
@@ -73,27 +76,12 @@ public class RecognitionObserver implements AmbientIndicationManagerCallback {
     @Override
     public void onSettingsChanged(String key, boolean newValue) {
         if (key.equals(Settings.System.AMBIENT_RECOGNITION)) {
-            isRecognitionEnabled = newValue;
-            if (!isRecognitionEnabled) {
+            if (!mManager.isRecognitionEnabled()) {
                 if (mManager.DEBUG)
                     Log.d(TAG, "Recognition disabled, stopping all and triggering dispatchRecognitionNoResult");
                 stopRecording();
                 mManager.dispatchRecognitionNoResult();
             }
-        }
-    }
-
-    /**
-     * Class storing fingerprinting results
-     */
-    public static class Observable {
-
-        public String Artist;
-        public String Song;
-
-        @Override
-        public String toString() {
-            return Song + " by " + Artist;
         }
     }
 
@@ -111,7 +99,7 @@ public class RecognitionObserver implements AmbientIndicationManagerCallback {
             while (isRecording && mBuffer != null) {
                 int read = 0;
                 synchronized (this) {
-                    if (!isRecognitionEnabled) {
+                    if (!mManager.isRecognitionEnabled()) {
                         break;
                     }
                     if (mRecorder != null) {
@@ -128,7 +116,7 @@ public class RecognitionObserver implements AmbientIndicationManagerCallback {
                             System.arraycopy(mBuffer, 0, buffCopy, 0, buffCopy.length);
                         }
                     }
-                    if (!isRecognitionEnabled) {
+                    if (!mManager.isRecognitionEnabled()) {
                         break;
                     }
                 }
@@ -141,7 +129,7 @@ public class RecognitionObserver implements AmbientIndicationManagerCallback {
         }
 
         private void tryMatchCurrentBuffer() {
-            if (!isRecognitionEnabled) {
+            if (!mManager.isRecognitionEnabled()) {
                 stopRecording();
                 return;
             }
@@ -149,47 +137,24 @@ public class RecognitionObserver implements AmbientIndicationManagerCallback {
                 new Thread() {
                     public void run() {
                         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-                        String requestResult;
+                        Observable observed;
                         try {
                             ByteArrayOutputStream finalBuffer = new ByteArrayOutputStream();
                             WaveFormat header = new WaveFormat(WaveFormat.FORMAT_PCM, CHANNELS, SAMPLE_RATE, BIT_DEPTH, buffCopy.length);
                             header.write(finalBuffer);
                             finalBuffer.write(buffCopy);
                             finalBuffer.close();
-                            requestResult = AuddApi.sendRequest(mManager, finalBuffer.toByteArray());
+                            observed = AmbientPlayProvider.getData(finalBuffer.toByteArray(), mContext);
                         } catch (Exception e) {
                             if (mManager.DEBUG) e.printStackTrace();
-                            requestResult = null;
+                            observed = null;
                         }
-                        parseResult(requestResult);
+                        reportResult(observed);
                     }
                 }.start();
             } else {
                 if (mManager.DEBUG) Log.e(TAG, "0 bytes recorded!?");
             }
-        }
-
-        private void parseResult(String result) {
-            if (!isRecognitionEnabled || result == null) {
-                reportResult(null);
-                return;
-            }
-            // Return result
-            if (mManager.DEBUG) Log.d(TAG, "Parsing result: " + result);
-            Observable observed = new Observable();
-            try {
-                JSONObject jsonResult = new JSONObject(result);
-                if (!jsonResult.isNull("status") && jsonResult.getString("status").equals("success") && !jsonResult.isNull("result")) {
-                    observed.Artist = jsonResult.getJSONObject("result").getString("artist");
-                    observed.Song = jsonResult.getJSONObject("result").getString("title");
-                    if (mManager.DEBUG) Log.d(TAG, "Got a match: " + observed);
-                } else {
-                    if (mManager.DEBUG) Log.d(TAG, "No match (Maybe we could not hear the song?)");
-                }
-            } catch (Exception e) {
-                if (mManager.DEBUG) e.printStackTrace();
-            }
-            reportResult(observed);
         }
 
         private boolean isNullResult(Observable observed) {
@@ -200,7 +165,7 @@ public class RecognitionObserver implements AmbientIndicationManagerCallback {
             stopRecording();
             // If the recording is still active and we have no match, don't do anything. Otherwise,
             // report the result.
-            if (!isRecognitionEnabled || isNullResult(observed)) {
+            if (!mManager.isRecognitionEnabled() || isNullResult(observed)) {
                 if (mManager.DEBUG) Log.d(TAG, "Reporting onNoMatch");
                 mManager.dispatchRecognitionNoResult();
             } else {
@@ -212,42 +177,40 @@ public class RecognitionObserver implements AmbientIndicationManagerCallback {
     }
 
     void startRecording() {
-        if (!isRecognitionEnabled || isRecording) {
+        if (!mManager.isRecognitionEnabled()) {
+            stopRecording();
+            mManager.dispatchRecognitionError();
+            return;
+        }
+        if (isRecording) {
             return;
         }
         isRecording = true;
-        // Only start recording audio if we have internet connectivity.
-        if (mManager.getNetworkStatus() != -1) {
-            new Thread() {
-                @Override
-                public void run() {
-                    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+        new Thread() {
+            @Override
+            public void run() {
+                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                try {
                     try {
-                        try {
-                            // Make sure buffer is cleared before recording starts.
-                            mBuffer = new byte[bufferSize];
-                            mRecorder = new AudioRecord(MediaRecorder.AudioSource.CAMCORDER, SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, minBufSize);
-                            mRecThread = new RecorderThread();
-                            mRecorder.startRecording();
-                            mRecThread.start();
-                        } catch (Exception e) {
-                            if (mManager.DEBUG)
-                                Log.d(TAG, "Cannot start recording for recognition", e);
-                            mManager.dispatchRecognitionError();
-                        }
-                        Thread.currentThread().sleep(mManager.getRecordingMaxTime());
-                    } catch (Exception e2) {
+                        // Make sure buffer is cleared before recording starts.
+                        mBuffer = new byte[bufferSize];
+                        mRecorder = new AudioRecord(MediaRecorder.AudioSource.CAMCORDER, SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, minBufSize);
+                        mRecThread = new RecorderThread();
+                        mRecorder.startRecording();
+                        mRecThread.start();
+                    } catch (Exception e) {
+                        if (mManager.DEBUG)
+                            Log.d(TAG, "Cannot start recording for recognition", e);
                         mManager.dispatchRecognitionError();
                     }
-                    // Stop recording, process audio and post result.
-                    stopRecording();
+                    Thread.currentThread().sleep(mManager.getRecordingMaxTime());
+                } catch (Exception e2) {
+                    mManager.dispatchRecognitionError();
                 }
-            }.start();
-        } else {
-            if (mManager.DEBUG) Log.d(TAG, "No connectivity, triggering dispatchRecognitionError");
-            stopRecording();
-            mManager.dispatchRecognitionError();
-        }
+                // Stop recording, process audio and post result.
+                stopRecording();
+            }
+        }.start();
     }
 
     private void stopRecording() {
