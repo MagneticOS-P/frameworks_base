@@ -470,8 +470,6 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
     protected KeyguardViewMediator mKeyguardViewMediator;
     private ZenModeController mZenController;
 
-    private int mPreviousDarkMode;
-
     private DisplayManager mDisplayManager;
 
     private int mMinBrightness;
@@ -718,6 +716,8 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
     private boolean mRecognitionEnabledOnKeyguard;
     private Handler ambientClearingHandler;
     private Runnable ambientClearingRunnable;
+
+    private boolean mIsOnPowerSaveMode;
 
     @Override
     public void start() {
@@ -1052,27 +1052,14 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
         mBatteryController.addCallback(new BatteryStateChangeCallback() {
             @Override
             public void onPowerSaveChanged(boolean isPowerSave) {
+                mIsOnPowerSaveMode = isPowerSave;
                 mHandler.post(mCheckBarModes);
                 if (mDozeServiceHost != null) {
                     mDozeServiceHost.firePowerSaveChanged(isPowerSave);
                 }
 
                 if (NIGHT_MODE_IN_BATTERY_SAVER) {
-                    final UiModeManager umm = mContext.getSystemService(UiModeManager.class);
-                    if (isPowerSave) {
-                        mPreviousDarkMode = umm.getNightMode();
-                    }
-                    switch (mPreviousDarkMode) {
-                        case UiModeManager.MODE_NIGHT_AUTO:
-                        case UiModeManager.MODE_NIGHT_NO:
-                           umm.setNightMode(
-                                    isPowerSave ? UiModeManager.MODE_NIGHT_YES :
-                                            mPreviousDarkMode);
-                            break;
-                        case UiModeManager.MODE_NIGHT_YES:
-                            // do nothing, the user forced dark mode
-                            break;
-                    }
+                    updateTheme(true);
                 }
             }
 
@@ -4235,20 +4222,22 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
      * Switches theme from light to dark and vice-versa.
      */
     protected void updateTheme() {
-        final boolean inflated = mStackScroller != null && mStatusBarWindowManager != null;
+        updateTheme(false);
+    }
 
+    protected void updateTheme(boolean fromPowerSaveCallback) {
+        final boolean inflated = mStackScroller != null && mStatusBarWindowManager != null;
+        final UiModeManager umm = mContext.getSystemService(UiModeManager.class);
         // The system wallpaper defines if QS should be light or dark.
-        WallpaperColors systemColors = mColorExtractor
-                .getWallpaperColors(WallpaperManager.FLAG_SYSTEM);
-        final boolean wallpaperWantsDarkTheme = systemColors != null
-                && (systemColors.getColorHints() & WallpaperColors.HINT_SUPPORTS_DARK_THEME) != 0;
-        final Configuration config = mContext.getResources().getConfiguration();
-        final boolean nightModeWantsDarkTheme = DARK_THEME_IN_NIGHT_MODE
-                && (config.uiMode & Configuration.UI_MODE_NIGHT_MASK)
-                    == Configuration.UI_MODE_NIGHT_YES;
-        final boolean useDarkTheme = wallpaperWantsDarkTheme || nightModeWantsDarkTheme;
+        final WallpaperColors systemColors = mColorExtractor.getWallpaperColors(WallpaperManager.FLAG_SYSTEM);
+        boolean darkThemeNeeded = systemColors != null && (systemColors.getColorHints() & WallpaperColors.HINT_SUPPORTS_DARK_THEME) != 0;
+        if ((fromPowerSaveCallback || !darkThemeNeeded) && DARK_THEME_IN_NIGHT_MODE && mIsOnPowerSaveMode){
+            darkThemeNeeded = true;
+        }
+        final boolean useDarkTheme = darkThemeNeeded;
         if (isUsingDarkTheme() != useDarkTheme) {
             mUiOffloadThread.submit(() -> {
+                umm.setNightMode(useDarkTheme ? UiModeManager.MODE_NIGHT_YES : UiModeManager.MODE_NIGHT_NO);
                 try {
                     mOverlayManager.setEnabled("com.android.systemui.theme.dark",
                             useDarkTheme, mLockscreenUserManager.getCurrentUserId());
