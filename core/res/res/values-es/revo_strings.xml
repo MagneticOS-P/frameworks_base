@@ -18,4 +18,8 @@
     <string name="reboot_title">Reiniciar</string>
     <string name="reboot_message">Reiniciando sistema</string>
 
+    <!-- SystemUI Restart -->
+    <string name="systemui_restart_title">Se necesita reiniciar la interfaz de usuario</string>
+    <string name="systemui_restart_message">Para que los cambios tengan efecto es necesario un reinicio de la interfaz de usuario, hacerlo ahora?</string>
+
 </resources>
