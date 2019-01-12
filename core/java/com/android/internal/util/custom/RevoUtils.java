@@ -44,6 +44,7 @@ import android.os.SystemProperties;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import com.android.internal.R;
 
 import java.util.List;
 
