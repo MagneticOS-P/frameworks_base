@@ -4673,7 +4673,7 @@ public final class Settings {
          */
         public static final String THREE_FINGER_GESTURE = "three_finger_gesture";
 
-	/**
+	    /**
          * Whether to display the reboot option in the power menu
          *
          * @hide
@@ -4702,50 +4702,19 @@ public final class Settings {
         public static final String POWERMENU_AIRPLANE = "powermenu_airplane";
 
         /**
-         * @hide
-         */
-        public static final String START_SCREEN_STATE_SERVICE = "start_screen_state_service";
-
-        /**
-         * @hide
-         */
-        public static final String SCREEN_STATE_TWOG = "screen_state_twog";
-
-         /**
-	  ** Whether the use proximity sensor for answering incoming ring
-	  **/
+	    ** Whether the use proximity sensor for answering incoming ring
+	    **/
         public static final String PROXIMITY_AUTO_ANSWER_INCALL_ONLY = "proximity_auto_answer_incall_only";
 
-         /**
-	  ** Time delay to activate auto answer on ring when headset is plugged
-	  * */
+        /**
+	    ** Time delay to activate auto answer on ring when headset is plugged
+	    **/
         public static final String AUTO_ANSWER_DELAY = "auto_answer_delay";
 
-         /**
-	  ** Whether to enable auto answer on ring when headset is plugged
-	  **/
+        /**
+	    ** Whether to enable auto answer on ring when headset is plugged
+	    **/
         public static final String AUTO_ANSWER_CALL_KEY = "auto_answer_call_key";
-
-        /**
-         * @hide
-         */
-        public static final String SCREEN_STATE_GPS = "screen_state_gps";
-
-        /**
-         * @hide
-         */
-        public static final String SCREEN_STATE_MOBILE_DATA = "screen_state_mobile_data";
-
-        /**
-         * @hide
-         */
-        public static final String SCREEN_STATE_OFF_DELAY = "screen_state_off_delay";
-
-        /**
-         * @hide
-         */
-        public static final String SCREEN_STATE_ON_DELAY = "screen_state_on_delay";
-
 
         /**
          *  Enable statusbar double tap gesture on to put device to sleep
