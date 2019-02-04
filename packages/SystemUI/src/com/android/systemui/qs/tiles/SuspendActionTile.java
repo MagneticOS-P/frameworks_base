@@ -131,7 +131,7 @@ public class SuspendActionTile extends QSTileImpl<BooleanState> {
  
     @Override 
     public int getMetricsCategory() { 
-        return MetricsEvent.HAVOC_SETTINGS; 
+        return MetricsEvent.REVO_SETTINGS; 
     } 
  
 }
