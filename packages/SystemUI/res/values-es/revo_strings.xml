@@ -91,5 +91,7 @@
     <string name="heads_up_snooze_message_one_minute"><xliff:g id="string">%s</xliff:g> - La notificación emergente será silenciada durante 1 minuto.</string>
     <string name="heads_up_snooze_message"><xliff:g id="string">%s</xliff:g> - La notificación emergente será silenciada durante <xliff:g id="number">%d</xliff:g> minutos.</string>
 
+    <string name="suspend_title_tile">Acciones reposo</string>
+
 </resources>
 

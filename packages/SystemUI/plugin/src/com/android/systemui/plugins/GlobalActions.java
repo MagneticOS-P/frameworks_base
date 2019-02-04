@@ -26,7 +26,7 @@ public interface GlobalActions extends Plugin {
     int VERSION = 1;
 
     void showGlobalActions(GlobalActionsManager manager);
-    default void showShutdownUi(boolean isReboot, String reason, boolean rebootCustom) {
+    default void showShutdownUi(boolean isReboot, String reason) {
     }
 
     default void destroy() {
@@ -38,7 +38,6 @@ public interface GlobalActions extends Plugin {
 
         void onGlobalActionsShown();
         void onGlobalActionsHidden();
-
         void shutdown();
         void reboot(boolean safeMode);
         void advancedReboot(String mode);

@@ -86,4 +86,6 @@
 
     <string name="recents_free_ram">Free RAM: %1$d MB</string>
 
+    <string name="suspend_title_tile">Suspend Action</string>
+
 </resources>
