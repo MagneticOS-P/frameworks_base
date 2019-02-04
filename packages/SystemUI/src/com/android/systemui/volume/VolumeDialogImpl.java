@@ -195,7 +195,7 @@ public class VolumeDialogImpl implements VolumeDialog {
     private SettingsObserver settingsObserver;
 
     public VolumeDialogImpl(Context context) {
-        mContext = new ContextThemeWrapper(context, com.android.systemui.R.style.qs_theme);
+        mContext = new ContextThemeWrapper(context, com.android.systemui.R.style.global_actions_theme);
         mController = Dependency.get(VolumeDialogController.class);
         mKeyguard = (KeyguardManager) mContext.getSystemService(Context.KEYGUARD_SERVICE);
         mAccessibilityMgr = Dependency.get(AccessibilityManagerWrapper.class);
@@ -243,16 +243,15 @@ public class VolumeDialogImpl implements VolumeDialog {
         lp.setTitle(VolumeDialogImpl.class.getSimpleName());
         if(!isAudioPanelOnLeftSide()){
             lp.gravity = Gravity.RIGHT | Gravity.CENTER_VERTICAL;
-            mDialog.setContentView(R.layout.volume_dialog);
         } else {
             lp.gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
-            mDialog.setContentView(R.layout.volume_dialog_left);
         }
         lp.windowAnimations = -1;
         mWindow.setAttributes(lp);
         mWindow.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         mDialog.setCanceledOnTouchOutside(true);
+        mDialog.setContentView(R.layout.volume_dialog);
         mDialog.setOnShowListener(dialog -> {
             if (!isLandscape()) mDialogView.setTranslationX((mDialogView.getWidth() / 2)*(isAudioPanelOnLeftSide() ? -1 : 1));
             mDialogView.setAlpha(0);
@@ -285,6 +284,11 @@ public class VolumeDialogImpl implements VolumeDialog {
 
         mDialogRowsView = mDialog.findViewById(R.id.volume_dialog_rows);
         mRinger = mDialog.findViewById(R.id.ringer);
+        if(!isAudioPanelOnLeftSide()) {
+            mRinger.setForegroundGravity(Gravity.RIGHT);
+        } else {
+            mRinger.setForegroundGravity(Gravity.LEFT);
+        }
         mRingerIcon = mRinger.findViewById(R.id.ringer_icon);
         mZenIcon = mRinger.findViewById(R.id.dnd_icon);
         mSettingsView = mDialog.findViewById(R.id.settings_container);
@@ -1243,7 +1247,7 @@ public class VolumeDialogImpl implements VolumeDialog {
 
     private final class CustomDialog extends Dialog implements DialogInterface {
         public CustomDialog(Context context) {
-            super(context, com.android.systemui.R.style.qs_theme);
+            super(context, com.android.systemui.R.style.global_actions_theme);
         }
 
         @Override

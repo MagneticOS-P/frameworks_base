@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2017 The Android Open Source Project
+ * Copyright (C) 2010-2015 CyanogenMod Project
+ * Copyright (C) 2017-2018 The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
  * except in compliance with the License. You may obtain a copy of the License at
@@ -120,7 +122,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
 
     private static final String TAG = "GlobalActionsDialog";
 
-    private static final boolean SHOW_SILENT_TOGGLE = true;
+    private static final boolean SHOW_SILENT_TOGGLE = false;
 
     /* Valid settings for global actions keys.
      * see config.xml config_globalActionList */
@@ -143,6 +145,13 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
     private static final int RESTART_RECOVERY_BUTTON = 3;
     private static final int RESTART_BOOTLOADER_BUTTON = 4;
     private static final int RESTART_UI_BUTTON = 5;
+
+    /**
+     * Advanced restart menu actions
+     */
+    private static final String GLOBAL_ACTION_KEY_RESTART_RECOVERY = "restart_recovery";
+    private static final String GLOBAL_ACTION_KEY_RESTART_BOOTLOADER = "restart_bootloader";
+    private static final String GLOBAL_ACTION_KEY_RESTART_DOWNLOAD = "restart_download";
 
     private final Context mContext;
     private final GlobalActionsManager mWindowManagerFuncs;
@@ -185,7 +194,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
      * @param context everything needs a context :(
      */
     public GlobalActionsDialog(Context context, GlobalActionsManager windowManagerFuncs) {
-        mContext = new ContextThemeWrapper(context, com.android.systemui.R.style.qs_theme);
+        mContext = new ContextThemeWrapper(context, com.android.systemui.R.style.global_actions_theme);
         mWindowManagerFuncs = windowManagerFuncs;
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         mDreamManager = IDreamManager.Stub.asInterface(
@@ -227,6 +236,11 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
 
         mEmergencyAffordanceManager = new EmergencyAffordanceManager(context);
         mScreenshotHelper = new ScreenshotHelper(context);
+
+        mDefaultMenuActions = mContext.getResources().getStringArray(
+                com.android.internal.R.array.config_globalActionsList);
+        mRestartMenuActions = mContext.getResources().getStringArray(
+                com.android.internal.R.array.config_restartActionsList);
     }
 
     /**
@@ -290,6 +304,8 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
     public void showDialog(boolean keyguardShowing, boolean isDeviceProvisioned) {
         mKeyguardShowing = keyguardShowing;
         mDeviceProvisioned = isDeviceProvisioned;
+        mIsRestartMenu = false;
+        mCurrentMenuActions = mDefaultMenuActions;
         if (mDialog != null) {
             mDialog.dismiss();
             mDialog = null;
@@ -337,6 +353,43 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
             mDialog.getWindow().setAttributes(attrs);
             mDialog.show();
             mWindowManagerFuncs.onGlobalActionsShown();
+        }
+    }
+
+    private List<Action> getCurrentRestartMenuItems() {
+        List<Action> items = new ArrayList<Action>();
+
+        String[] restartMenuActions = mContext.getResources().getStringArray(
+                    com.android.internal.R.array.config_restartActionsList);
+        for (int i = 0; i < restartMenuActions.length; i++) {
+            String actionKey = restartMenuActions[i];
+            if (GLOBAL_ACTION_KEY_RESTART_RECOVERY.equals(actionKey)) {
+                items.add(new RestartRecoveryAction());
+            } else if (GLOBAL_ACTION_KEY_RESTART_BOOTLOADER.equals(actionKey)) {
+                items.add(new RestartBootloaderAction());
+            } else if (GLOBAL_ACTION_KEY_RESTART_DOWNLOAD.equals(actionKey)) {
+                items.add(new RestartDownloadAction());
+            }
+        }
+        return items;
+    }
+
+    private boolean isAdvancedRestartPossible() {
+        KeyguardManager km = (KeyguardManager) mContext.getSystemService(Context.KEYGUARD_SERVICE);
+        boolean keyguardLocked = km.inKeyguardRestrictedInputMode() && km.isKeyguardSecure();
+        boolean advancedRestartEnabled = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.ADVANCED_REBOOT, 0) == 1;
+        boolean isPrimaryUser = UserHandle.getCallingUserId() == UserHandle.USER_OWNER;
+
+        return advancedRestartEnabled && !keyguardLocked && isPrimaryUser;
+    }
+
+    private boolean shouldShowRestartSubmenu() {
+        if (!isAdvancedRestartPossible()) {
+            return false;
+        } else {
+            List<Action> restartMenuItems = getCurrentRestartMenuItems();
+            return restartMenuItems.size() > 0;
         }
     }
 
@@ -481,14 +534,14 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
         ArraySet<String> addedKeys = new ArraySet<String>();
         mHasLogoutButton = false;
         mHasLockdownButton = false;
-        for (int i = 0; i < defaultActions.length; i++) {
-            String actionKey = defaultActions[i];
+        for (int i = 0; i < mCurrentMenuActions.length; i++) {
+            String actionKey = mCurrentMenuActions[i];
             if (addedKeys.contains(actionKey)) {
                 // If we already have added this, don't add it again.
                 continue;
             }
             if (GLOBAL_ACTION_KEY_POWER.equals(actionKey)) {
-                mItems.add(new PowerAction());
+                continue;
             } else if (GLOBAL_ACTION_KEY_AIRPLANE.equals(actionKey)) {
                 if (Settings.System.getInt(mContext.getContentResolver(),
                         Settings.System.POWERMENU_AIRPLANE, 0) != 0) {
@@ -549,7 +602,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
             addedKeys.add(actionKey);
         }
 
-        if (mEmergencyAffordanceManager.needsEmergencyAffordance()) {
+        if (mEmergencyAffordanceManager.needsEmergencyAffordance() && !mIsRestartMenu) {
             mItems.add(getEmergencyAction());
         }
 
@@ -646,7 +699,23 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
 
         @Override
         public void onPress() {
-            mWindowManagerFuncs.reboot(false);
+            if (!mIsRestartMenu && shouldShowRestartSubmenu()) {
+                mIsRestartMenu = true;
+                mCurrentMenuActions = mRestartMenuActions;
+                if (mDialog != null) {
+                    mDialog.dismiss();
+                    mDialog = null;
+                    // Show delayed, so that the dismiss of the previous dialog completes
+                    mHandler.sendEmptyMessageDelayed(MESSAGE_SHOW, DIALOG_SHOW_DELAY);
+                } else {
+                    handleShow();
+                }
+            } else {
+                mHandler.sendEmptyMessage(MESSAGE_DISMISS);
+                if (mIsRestartMenu || !isAdvancedRestartPossible()) {
+                    mWindowManagerFuncs.reboot(false, null);
+                }
+            }
         }
     }
 
@@ -1136,8 +1205,9 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
     private static abstract class SinglePressAction implements Action {
         private final int mIconResId;
         private final Drawable mIcon;
-        private final int mMessageResId;
+        protected int mMessageResId;
         private final CharSequence mMessage;
+        private CharSequence mStatusMessage;
 
         protected SinglePressAction(int iconResId, int messageResId) {
             mIconResId = iconResId;
@@ -1157,8 +1227,12 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
             return true;
         }
 
-        public String getStatus() {
-            return null;
+        public CharSequence getStatus() {
+            return mStatusMessage;
+        }
+
+        public void setStatus(CharSequence status) {
+            mStatusMessage = status;
         }
 
         abstract public void onPress();
@@ -1180,7 +1254,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
             TextView messageView = (TextView) v.findViewById(R.id.message);
 
             TextView statusView = (TextView) v.findViewById(R.id.status);
-            final String status = getStatus();
+            final CharSequence status = getStatus();
             if (!TextUtils.isEmpty(status)) {
                 statusView.setText(status);
             } else {
@@ -1188,7 +1262,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
             }
             if (mIcon != null) {
                 icon.setImageDrawable(mIcon);
-                icon.setScaleType(ScaleType.CENTER_CROP);
+                icon.setScaleType(ScaleType.CENTER);
             } else if (mIconResId != 0) {
                 icon.setImageDrawable(context.getDrawable(mIconResId));
             }
@@ -1270,7 +1344,7 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
                 LayoutInflater inflater) {
             willCreate();
 
-            View v = inflater.inflate(R
+            View v = inflater.inflate(com.android.systemui.R
                     .layout.global_actions_item, parent, false);
 
             ImageView icon = (ImageView) v.findViewById(R.id.icon);
@@ -1291,12 +1365,10 @@ class GlobalActionsDialog implements DialogInterface.OnDismissListener,
             }
 
             if (statusView != null) {
-                statusView.setText(on ? mEnabledStatusMessageResId : mDisabledStatusMessageResId);
-                statusView.setVisibility(View.VISIBLE);
-                statusView.setEnabled(enabled);
+                statusView.setVisibility(View.GONE);
             }
-            v.setEnabled(enabled);
 
+            v.setEnabled(enabled);
             return v;
         }
 

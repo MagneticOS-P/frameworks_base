@@ -592,6 +592,7 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
     protected NotificationLockscreenUserManager mLockscreenUserManager;
     protected NotificationRemoteInputManager mRemoteInputManager;
 
+    private boolean mWallpaperSupportsAmbientMode;
     private BroadcastReceiver mWallpaperChangedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -601,13 +602,16 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
                 return;
             }
             WallpaperInfo info = wallpaperManager.getWallpaperInfo();
-            final boolean supportsAmbientMode = info != null &&
-                    info.getSupportsAmbientMode();
+            mWallpaperSupportsAmbientMode = info != null && info.getSupportsAmbientMode();
 
-            mStatusBarWindowManager.setWallpaperSupportsAmbientMode(supportsAmbientMode);
-            mScrimController.setWallpaperSupportsAmbientMode(supportsAmbientMode);
+            mStatusBarWindowManager.setWallpaperSupportsAmbientMode(mWallpaperSupportsAmbientMode);
+            mScrimController.setWallpaperSupportsAmbientMode(mWallpaperSupportsAmbientMode);
         }
     };
+
+    public boolean wallpaperSupportsAmbientMode(){
+        return mWallpaperSupportsAmbientMode;
+    }
 
     private Runnable mLaunchTransitionEndRunnable;
     protected boolean mLaunchTransitionFadingAway;
@@ -1403,6 +1407,12 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
         if (mBrightnessMirrorController != null) {
             mBrightnessMirrorController.onOverlayChanged();
         }
+        updateNotificationViews();
+        mStackScroller.onOverlayChanged();
+        mNotificationShelf.onOverlayChanged();
+        mNotificationPanel.onOverlayChanged();
+        Dependency.get(DarkIconDispatcher.class).onOverlayChanged(mContext);
+        mEntryManager.onOverlayChanged();
     }
 
     private void inflateEmptyShadeView() {
@@ -2343,12 +2353,26 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
     public boolean isUsingDarkTheme() {
         OverlayInfo themeInfo = null;
         try {
-            themeInfo = mOverlayManager.getOverlayInfo("com.android.systemui.theme.dark",
+            themeInfo = mOverlayManager.getOverlayInfo("com.android.system.theme.dark",
                     mLockscreenUserManager.getCurrentUserId());
         } catch (RemoteException e) {
             e.printStackTrace();
         }
         return themeInfo != null && themeInfo.isEnabled();
+    }
+
+    public void unloadStockDarkTheme() {
+        OverlayInfo themeInfo = null;
+        try {
+            themeInfo = mOverlayManager.getOverlayInfo("com.android.systemui.theme.dark",
+                    mLockscreenUserManager.getCurrentUserId());
+            if (themeInfo != null && themeInfo.isEnabled()) {
+                mOverlayManager.setEnabled("com.android.systemui.theme.dark",
+                        false /*disable*/, mLockscreenUserManager.getCurrentUserId());
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setCutoutOverlay(boolean enable) {
@@ -4302,8 +4326,21 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
             mUiOffloadThread.submit(() -> {
                 umm.setNightMode(useDarkTheme ? UiModeManager.MODE_NIGHT_YES : UiModeManager.MODE_NIGHT_NO);
                 try {
-                    mOverlayManager.setEnabled("com.android.systemui.theme.dark",
+                    mOverlayManager.setEnabled("com.android.system.theme.dark",
                             useDarkTheme, mLockscreenUserManager.getCurrentUserId());
+                    mOverlayManager.setEnabled("com.android.systemui.custom.theme.dark",
+                            useDarkTheme, mLockscreenUserManager.getCurrentUserId());
+                    mOverlayManager.setEnabled("com.android.settings.theme.dark",
+                            useDarkTheme, mLockscreenUserManager.getCurrentUserId());
+                    mOverlayManager.setEnabled("com.android.gboard.theme.dark",
+                            useDarkTheme, mLockscreenUserManager.getCurrentUserId());
+                    mOverlayManager.setEnabled("com.android.gboard.theme.light",
+                            !useDarkTheme, mLockscreenUserManager.getCurrentUserId());
+                    mOverlayManager.setEnabled("com.android.wellbeing.theme.dark",
+                            useDarkTheme, mLockscreenUserManager.getCurrentUserId());
+                    if (useDarkTheme) {
+                        unloadStockDarkTheme();
+                    }
                 } catch (RemoteException e) {
                     Log.w(TAG, "Can't change theme", e);
                 }
