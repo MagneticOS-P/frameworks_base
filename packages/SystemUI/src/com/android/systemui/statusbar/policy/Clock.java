@@ -68,6 +68,8 @@ import java.util.TimeZone;
 public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
         DarkReceiver, ConfigurationListener {
 
+    private static final String QSHEADER = "qsheader";
+
     private final CurrentUserTracker mCurrentUserTracker;
     private int mCurrentUserId;
 
@@ -226,6 +228,25 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
             }
         };
         updateSettings();
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState() {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(QSHEADER, mQsHeader);
+
+        return bundle;
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        if (state == null || !(state instanceof Bundle)) {
+            super.onRestoreInstanceState(state);
+            return;
+        }
+
+        Bundle bundle = (Bundle) state;
+        mQsHeader = bundle.getBoolean(QSHEADER, false);
     }
 
     @Override
