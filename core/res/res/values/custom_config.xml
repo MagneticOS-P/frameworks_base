@@ -195,15 +195,11 @@
     <!-- Whether to allow process with media UID to access CameraServiceProxy -->
     <bool name="config_allowMediaUidForCameraServiceProxy">false</bool>
 
-
     <!-- Component name for the activity that will be presenting the Oreo's Recents UI -->
     <string name="config_recentsComponentNameOreo" translatable="false">com.android.systemui/.recents.RecentsActivity</string>
 
     <!-- Whether device has a physical display cutout -->
     <bool name="config_physicalDisplayCutout">false</bool>
-
-    <!-- Whether to show battery percentage inside icon -->
-    <bool name="config_battery_percentage_show_inside_icon">false</bool>
 
     <!-- True if the notifications should dynamically tint the app icon -->
     <bool name="config_allowNotificationIconTinting">true</bool>

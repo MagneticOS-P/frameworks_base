@@ -73,7 +73,6 @@ public class BatteryMeterView extends LinearLayout implements
     private int mLevel;
     private boolean mForceShowPercent;
     private boolean mShowPercentAvailable;
-    private boolean mShowPercentInsideIcon;
 
     private int mDarkModeBackgroundColor;
     private int mDarkModeFillColor;
@@ -122,8 +121,6 @@ public class BatteryMeterView extends LinearLayout implements
         mSettingObserver = new SettingObserver(new Handler(context.getMainLooper()));
         mShowPercentAvailable = context.getResources().getBoolean(
                 com.android.internal.R.bool.config_battery_percentage_setting_available);
-        mShowPercentInsideIcon = context.getResources().getBoolean(
-                com.android.internal.R.bool.config_battery_percentage_show_inside_icon);
 
 
         addOnAttachStateChangeListener(
@@ -311,7 +308,6 @@ public class BatteryMeterView extends LinearLayout implements
                 removeView(mBatteryPercentView);
                 mBatteryPercentView = null;
             }
-            mDrawable.setShowPercent(false);
         }
     }
 
@@ -324,9 +320,6 @@ public class BatteryMeterView extends LinearLayout implements
     public void onOverlayChanged() {
         mShowPercentAvailable = getContext().getResources().getBoolean(
                 com.android.internal.R.bool.config_battery_percentage_setting_available);
-        mShowPercentInsideIcon = getContext().getResources().getBoolean(
-                com.android.internal.R.bool.config_battery_percentage_show_inside_icon);
-        updateShowPercent();
     }
 
     /**
