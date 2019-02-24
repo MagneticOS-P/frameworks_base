@@ -147,6 +147,9 @@
     <!-- Whether device has a physical display cutout -->
     <java-symbol type="bool" name="config_physicalDisplayCutout" />
 
+    <!-- Whether to show battery percentage inside icon -->
+    <java-symbol type="bool" name="config_battery_percentage_show_inside_icon" />
+
     <!-- Auto fill -->
     <java-symbol type="color" name="autofill_save_title_color" />
     <java-symbol type="color" name="autofill_autofill_save_custom_subtitle_color" />
@@ -176,5 +179,8 @@
          0 - Celsius
          1 - Fahrenheit -->
     <java-symbol type="integer" name="weather_lockscreen_default_unit" />
+
+    <!-- Whether to allow sending active app broadcast -->
+    <java-symbol type="bool" name="config_allowActivePackageBroadcast" />
 
 </resources>

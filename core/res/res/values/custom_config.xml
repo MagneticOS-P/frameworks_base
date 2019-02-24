@@ -201,6 +201,9 @@
     <!-- Whether device has a physical display cutout -->
     <bool name="config_physicalDisplayCutout">false</bool>
 
+    <!-- Whether to show battery percentage inside icon -->
+    <bool name="config_battery_percentage_show_inside_icon">false</bool>
+
     <!-- True if the notifications should dynamically tint the app icon -->
     <bool name="config_allowNotificationIconTinting">true</bool>
 
@@ -213,5 +216,8 @@
          0 - Celsius
          1 - Fahrenheit -->
     <integer name="weather_lockscreen_default_unit">0</integer>
+
+    <!-- Whether to allow sending active app broadcast -->
+    <bool name="config_allowActivePackageBroadcast">false</bool>
 
 </resources>

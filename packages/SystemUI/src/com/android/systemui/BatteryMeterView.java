@@ -73,6 +73,7 @@ public class BatteryMeterView extends LinearLayout implements
     private int mLevel;
     private boolean mForceShowPercent;
     private boolean mShowPercentAvailable;
+    private boolean mShowPercentInsideIcon;
 
     private int mDarkModeBackgroundColor;
     private int mDarkModeFillColor;
@@ -94,6 +95,8 @@ public class BatteryMeterView extends LinearLayout implements
 
     private int mNonAdaptedForegroundColor;
     private int mNonAdaptedBackgroundColor;
+
+    private boolean mCharging;
 
     public BatteryMeterView(Context context) {
         this(context, null, 0);
@@ -121,6 +124,8 @@ public class BatteryMeterView extends LinearLayout implements
         mSettingObserver = new SettingObserver(new Handler(context.getMainLooper()));
         mShowPercentAvailable = context.getResources().getBoolean(
                 com.android.internal.R.bool.config_battery_percentage_setting_available);
+        mShowPercentInsideIcon = context.getResources().getBoolean(
+                com.android.internal.R.bool.config_battery_percentage_show_inside_icon);
 
 
         addOnAttachStateChangeListener(
@@ -243,6 +248,10 @@ public class BatteryMeterView extends LinearLayout implements
 
         mDrawable.setBatteryLevel(level);
         mDrawable.setCharging(pluggedIn);
+        if (mCharging != pluggedIn){
+            mCharging = pluggedIn;
+            updateShowPercent();
+        }
         mLevel = level;
         updatePercentText();
         setContentDescription(
@@ -308,24 +317,33 @@ public class BatteryMeterView extends LinearLayout implements
                 removeView(mBatteryPercentView);
                 mBatteryPercentView = null;
             }
+            mDrawable.setShowPercent(false);
+            scaleBatteryMeterViews();
         }
     }
 
     @Override
     public void onDensityOrFontScaleChanged() {
-        scaleBatteryMeterViews();
+        updateShowPercent();
     }
 
     @Override
     public void onOverlayChanged() {
         mShowPercentAvailable = getContext().getResources().getBoolean(
                 com.android.internal.R.bool.config_battery_percentage_setting_available);
+        mShowPercentInsideIcon = getContext().getResources().getBoolean(
+                com.android.internal.R.bool.config_battery_percentage_show_inside_icon);
+        updateShowPercent();
     }
 
     /**
      * Looks up the scale factor for status bar icons and scales the battery view by that amount.
      */
     private void scaleBatteryMeterViews() {
+        scaleBatteryMeterViews(false);
+    }
+
+    private void scaleBatteryMeterViews(boolean percentageInsideIcon) {
         Resources res = getContext().getResources();
         TypedValue typedValue = new TypedValue();
 
@@ -333,11 +351,12 @@ public class BatteryMeterView extends LinearLayout implements
         float iconScaleFactor = typedValue.getFloat();
 
         int batteryHeight = res.getDimensionPixelSize(R.dimen.status_bar_battery_icon_height);
-        int batteryWidth = res.getDimensionPixelSize(R.dimen.status_bar_battery_icon_width);
+        int batteryWidth = percentageInsideIcon && !mCharging ? res.getDimensionPixelSize(R.dimen.status_bar_battery_icon_width_percentage_inside) : 
+                            (int) (res.getDimensionPixelSize(R.dimen.status_bar_battery_icon_width) * iconScaleFactor);
         int marginBottom = res.getDimensionPixelSize(R.dimen.battery_margin_bottom);
 
         LinearLayout.LayoutParams scaledLayoutParams = new LinearLayout.LayoutParams(
-                (int) (batteryWidth * iconScaleFactor), (int) (batteryHeight * iconScaleFactor));
+                batteryWidth, (int) (batteryHeight * iconScaleFactor));
         scaledLayoutParams.setMargins(0, 0, 0, marginBottom);
 
         if (mBatteryIconView != null) {
