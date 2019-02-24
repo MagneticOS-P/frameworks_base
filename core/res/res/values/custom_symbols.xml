@@ -183,4 +183,7 @@
     <!-- Whether to allow sending active app broadcast -->
     <java-symbol type="bool" name="config_allowActivePackageBroadcast" />
 
+    <!-- Whether device support performance modes -->
+    <java-symbol type="bool" name="config_supportPerfModes" />
+
 </resources>
