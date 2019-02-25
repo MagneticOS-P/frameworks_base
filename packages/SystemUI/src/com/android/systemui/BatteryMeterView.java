@@ -99,8 +99,6 @@ public class BatteryMeterView extends LinearLayout implements
     private int mNonAdaptedForegroundColor;
     private int mNonAdaptedBackgroundColor;
 
-    private boolean mCharging;
-
     public BatteryMeterView(Context context) {
         this(context, null, 0);
     }
@@ -251,10 +249,10 @@ public class BatteryMeterView extends LinearLayout implements
         }
         mDrawable.setBatteryLevel(level);
         mDrawable.setCharging(pluggedIn);
-        if (mCharging != pluggedIn){
-            mCharging = pluggedIn;
-            updateShowPercent();
-        }
+        //if (mCharging != pluggedIn){
+            //mCharging = pluggedIn;
+            //updateShowPercent();
+        //}
         mLevel = level;
         updatePercentText();
         setContentDescription(
@@ -375,7 +373,7 @@ public class BatteryMeterView extends LinearLayout implements
         int marginBottom = res.getDimensionPixelSize(R.dimen.battery_margin_bottom);
 
         LinearLayout.LayoutParams scaledLayoutParams = new LinearLayout.LayoutParams(
-                batteryWidth, (int) (batteryHeight * iconScaleFactor));
+                (int) (batteryWidth * iconScaleFactor), (int) (batteryHeight * iconScaleFactor));
         scaledLayoutParams.setMargins(0, 0, 0, marginBottom);
 
         if (mBatteryIconView != null) {
