@@ -58,7 +58,7 @@ public class StatusBarWifiView extends FrameLayout implements DarkReceiver,
     private ImageView mWifiIcon;
     private ImageView mIn;
     private ImageView mOut;
-    private View mInoutContainer;
+    //private View mInoutContainer;
     private View mSignalSpacer;
     private View mAirplaneSpacer;
     private WifiIconState mState;
@@ -175,7 +175,7 @@ public class StatusBarWifiView extends FrameLayout implements DarkReceiver,
         mOut = findViewById(R.id.wifi_out);
         mSignalSpacer = findViewById(R.id.wifi_signal_spacer);
         mAirplaneSpacer = findViewById(R.id.wifi_airplane_spacer);
-        mInoutContainer = findViewById(R.id.inout_container);
+        //mInoutContainer = findViewById(R.id.inout_container);
 
         initDotView();
     }
@@ -218,8 +218,8 @@ public class StatusBarWifiView extends FrameLayout implements DarkReceiver,
 
         mIn.setVisibility(state.activityIn ? View.VISIBLE : View.GONE);
         mOut.setVisibility(state.activityOut ? View.VISIBLE : View.GONE);
-        mInoutContainer.setVisibility(
-                (state.activityIn || state.activityOut) ? View.VISIBLE : View.GONE);
+        //mInoutContainer.setVisibility(
+                //(state.activityIn || state.activityOut) ? View.VISIBLE : View.GONE);
         mAirplaneSpacer.setVisibility(state.airplaneSpacerVisible ? View.VISIBLE : View.GONE);
         mSignalSpacer.setVisibility(state.signalSpacerVisible ? View.VISIBLE : View.GONE);
         if (mState.visible != state.visible) {
@@ -240,8 +240,8 @@ public class StatusBarWifiView extends FrameLayout implements DarkReceiver,
 
         mIn.setVisibility(mState.activityIn ? View.VISIBLE : View.GONE);
         mOut.setVisibility(mState.activityOut ? View.VISIBLE : View.GONE);
-        mInoutContainer.setVisibility(
-                (mState.activityIn || mState.activityOut) ? View.VISIBLE : View.GONE);
+        //mInoutContainer.setVisibility(
+                //(mState.activityIn || mState.activityOut) ? View.VISIBLE : View.GONE);
         mAirplaneSpacer.setVisibility(mState.airplaneSpacerVisible ? View.VISIBLE : View.GONE);
         mSignalSpacer.setVisibility(mState.signalSpacerVisible ? View.VISIBLE : View.GONE);
         setVisibility(mState.visible ? View.VISIBLE : View.GONE);
