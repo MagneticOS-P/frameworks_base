@@ -926,7 +926,7 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
         final Context context = mContext;
         updateDisplaySize(); // populates mDisplayMetrics
         updateResources();
-        updateTheme();
+        updateTheme(false, themeNeedsRefresh());
 
         inflateStatusBarWindow(context);
         mStatusBarWindow.setService(this);
@@ -1091,7 +1091,7 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
                 }
 
                 if (NIGHT_MODE_IN_BATTERY_SAVER) {
-                    updateTheme(true);
+                    updateTheme(true, false);
                 }
             }
 
@@ -4333,7 +4333,7 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
      * Switches theme from light to dark and vice-versa.
      */
     protected void updateTheme() {
-        updateTheme(false);
+        updateTheme(false, false);
     }
 
     private boolean themeNeedsRefresh(){
@@ -4344,7 +4344,7 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
         return true;
     }
 
-    protected void updateTheme(boolean fromPowerSaveCallback) {
+    protected void updateTheme(boolean fromPowerSaveCallback, boolean themeNeedsRefresh) {
         final boolean inflated = mStackScroller != null && mStatusBarWindowManager != null;
         final UiModeManager umm = mContext.getSystemService(UiModeManager.class);
         // The system wallpaper defines if QS should be light or dark.
@@ -4354,7 +4354,7 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
             darkThemeNeeded = true;
         }
         final boolean useDarkTheme = darkThemeNeeded;
-        if (themeNeedsRefresh() || isUsingDarkTheme() != useDarkTheme) {
+        if (themeNeedsRefresh || isUsingDarkTheme() != useDarkTheme) {
             mUiOffloadThread.submit(() -> {
                 umm.setNightMode(useDarkTheme ? UiModeManager.MODE_NIGHT_YES : UiModeManager.MODE_NIGHT_NO);
                 try {
