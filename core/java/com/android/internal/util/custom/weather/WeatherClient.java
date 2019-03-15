@@ -68,6 +68,7 @@ public class WeatherClient {
     private List<WeatherObserver> mObserver;
     private boolean isRunning;
     private boolean isScreenOn = true;
+    private boolean mBootAndUnlockDone = false;
     private long lastUpdated;
     private long scheduledAlarmTime = 0;
     private AlarmManager alarmManager;
